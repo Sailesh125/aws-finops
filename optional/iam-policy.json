@@ -1,0 +1,35 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "PricingReadOnly",
+      "Effect": "Allow",
+      "Action": ["pricing:*"],
+      "Resource": "*"
+    },
+    {
+      "Sid": "BillingCostReadOnly",
+      "Effect": "Allow",
+      "Action": [
+        "ce:GetCostAndUsage",
+        "ce:GetCostForecast",
+        "ce:GetAnomalies",
+        "ce:GetSavingsPlansPurchaseRecommendation",
+        "ce:GetReservationPurchaseRecommendation",
+        "ce:GetTags",
+        "ce:ListCostAllocationTags",
+        "budgets:ViewBudget",
+        "budgets:DescribeBudgetActionsForBudget",
+        "freetier:GetFreeTierUsage",
+        "cost-optimization-hub:ListRecommendations",
+        "compute-optimizer:GetEC2InstanceRecommendations",
+        "compute-optimizer:GetLambdaFunctionRecommendations",
+        "billingconductor:ListBillingGroups",
+        "invoicing:ListInvoiceSummaries",
+        "billing:GetCredits",
+        "billing:GetBillingPreferences"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
