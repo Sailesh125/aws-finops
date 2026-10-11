@@ -1,6 +1,6 @@
 # AWS line items people forget
 
-Walk this list for every estimate. Add a line to the spec if the architecture implies it.
+Walk this list for every estimate. Add a calculator service entry for each one the architecture implies.
 
 ## Networking
 - **NAT Gateway** – hourly charge per gateway per AZ **plus** a per-GB data-processing charge. Private subnets with internet access almost always need one per AZ in prod.

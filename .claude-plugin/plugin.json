@@ -1,9 +1,17 @@
 {
   "name": "aws-finops",
-  "version": "0.2.0",
-  "description": "Estimate, analyze and optimize AWS infrastructure costs with no AWS credentials needed. Built-in calculator plus the credential-free AWS Knowledge MCP server; optional account-linked AWS servers for live prices and real spend.",
+  "version": "0.3.0",
+  "description": "Estimate, analyze and optimize AWS infrastructure costs with the official AWS Pricing Calculator (calculator.aws). Builds shareable estimates and reads back real calculator prices; no AWS credentials needed.",
   "author": {
     "name": "FinOps Shift-Left"
   },
-  "keywords": ["aws", "finops", "cloud-cost", "cost-estimation", "cost-optimization", "shift-left"]
+  "keywords": [
+    "aws",
+    "aws-pricing-calculator",
+    "cloud-cost",
+    "cost-estimation",
+    "cost-optimization",
+    "finops",
+    "shift-left"
+  ]
 }

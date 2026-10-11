@@ -1,43 +1,58 @@
 # aws-finops
 
-Estimate, analyze and optimize AWS infrastructure costs with Claude.
+A Claude plugin that estimates, analyzes and optimizes AWS infrastructure costs using the **official AWS Pricing Calculator** ([calculator.aws](https://calculator.aws)).
 
-**No AWS account, login or credentials needed.** Install and use it right away.
+Describe your setup or share Terraform, and Claude builds a real calculator.aws estimate. You get back a **shareable estimate link**, a cost breakdown, and savings options priced by the calculator.
+
+**No AWS account, login or credentials needed.**
 
 ## What's inside
 | Component | Needs AWS credentials? | Purpose |
 |---|---|---|
-| Skill: `aws-cost-estimator` | No | Estimate cost of a planned architecture or Terraform/CDK code, analyze an exported bill, compare options, recommend savings |
-| Built-in calculator (`estimate.py`) | No | Does all the arithmetic offline with approximate on-demand prices |
-| MCP: `aws-knowledge` (AWS-hosted) | No | Official AWS docs and pricing pages, region list, and whether a service or instance family is available in a region |
-| `optional/` folder | Yes – opt-in only | Two extra AWS servers for exact live prices and real account spend. Not loaded unless you add them. |
+| Skill: `aws-cost-estimator` | No | Workflow: gather inputs, map resources to calculator services, build the estimate, read costs, recommend savings |
+| MCP: `aws-calculator` ([aws-samples/sample-aws-pricing-calculator-mcp](https://github.com/aws-samples/sample-aws-pricing-calculator-mcp), MIT-0) | No | Builds, validates and saves estimates on calculator.aws; returns the share link |
+| MCP: `aws-calculator-costs` ([Musheer360/aws-calculator-mcp](https://github.com/Musheer360/aws-calculator-mcp), MIT) | No | Reads back the calculator's actual dollar figures from a saved estimate (uses your installed Chrome) |
+| MCP: `aws-knowledge` (AWS-hosted) | No | Checks whether a service or instance type is available in a region; AWS docs |
+| `optional/` | Yes, opt-in only | AWS Pricing API and Billing & Cost Management servers for live account data. Not loaded unless you add them. |
+
+## Requirements
+- **Node.js 18+**, which provides `npx`. Both calculator servers download automatically on first use.
+- **Google Chrome**, installed in its standard location, so costs can be read back. Chromium also works on Linux. Without Chrome you still get the estimate link; the totals show when you open it.
+- Internet access to calculator.aws.
 
 ## Example prompts
-- "Estimate the monthly AWS cost for 3 t3.medium servers behind an ALB, Postgres db.t3.medium Multi-AZ, 200 GB S3, in Mumbai."
+- "Estimate the monthly AWS cost for 3 t3.medium servers behind an ALB, Postgres db.t3.medium Multi-AZ, 200 GB S3, in Mumbai, and give me the calculator link."
 - "What will this Terraform cost?" (attach the `.tf` files)
+- "Compare on-demand vs a 1-year Compute Savings Plan for this setup."
 - "Here's our Cost Explorer CSV. Why did the bill go up?"
-- "Find the top 5 ways to cut this setup's cost."
-- "Compare ap-south-1 vs us-east-1 for this setup."
 
-## How prices work without credentials
-1. The calculator starts from a built-in table of approximate us-east-1 on-demand prices, scaled for other regions. Those lines are marked `approx.`
-2. For the biggest cost lines, Claude checks the official AWS pricing page (through the AWS Knowledge server or web search) and uses the verified price, citing the page and date.
-3. Analyzing an existing bill? Download a CSV from the AWS Billing console (Cost Explorer → Download CSV) and attach it. No API access needed.
+## How it works
+1. Claude lists your resources and adds commonly forgotten items (NAT, data transfer, EBS, Multi-AZ).
+2. It looks up each service's exact calculator fields, then builds and validates the estimate with `aws-calculator`.
+3. The estimate is saved to calculator.aws, which gives a share link.
+4. `aws-calculator-costs` opens the link in headless Chrome and reads the calculator's per-service and total costs.
+5. For savings, Claude builds an optimized estimate (Savings Plans, Graviton, gp3…) and compares the two totals.
 
-## Optional: exact live prices and real account data (needs AWS credentials)
-Only if you want it. Files are in `optional/`:
-- `mcp-aws-account.json` – adds the AWS Labs **Pricing** and **Billing & Cost Management** servers.
-- `iam-policy.json` – least-privilege read-only policy for them.
+All prices come from calculator.aws; the plugin has no built-in price list.
 
-To enable: install [uv](https://docs.astral.sh/uv/getting-started/installation/), configure an AWS profile (`aws configure --profile finops`), attach the policy, then merge the two server entries from `optional/mcp-aws-account.json` into the plugin's `.mcp.json` and set `AWS_PROFILE`. The skill picks them up automatically when present and ignores them when absent.
+## Version pinning
+The servers are pinned to the versions this plugin was written against: `sample-aws-pricing-calculator-mcp@1.3.3` and `aws-calculator-mcp@2.3.1`. To upgrade, change the versions in `.mcp.json` and re-test.
 
-## Costs & safety
-- The default setup makes no calls to your AWS account.
-- The AWS Knowledge server is free to use but rate-limited.
-- The skill stays read-only: it never buys Savings Plans/RIs or changes anything in AWS.
-- Figures are estimates; actual bills vary with usage, discounts, credits and taxes (e.g. 18% GST).
+## Optional: live account data (needs AWS credentials)
+See `optional/`:
+- `mcp-aws-account.json` adds the AWS Labs Pricing and Billing & Cost Management servers.
+- `iam-policy.json` is a least-privilege, read-only policy for them.
+
+To enable them: install [uv](https://docs.astral.sh/uv/getting-started/installation/), configure an AWS profile, attach the policy, merge the server entries into `.mcp.json`, and set `AWS_PROFILE`.
+
+## Notes and limits
+- Calculator share links are public to anyone who has the URL. Keep estimate names free of sensitive details.
+- The calculator servers use calculator.aws endpoints that AWS doesn't document, so they may break when AWS changes the calculator. The AWS sample server describes itself as sample code.
+- Figures are estimates. Actual bills vary with usage, discounts, credits and taxes (e.g. 18% GST).
+- The skill is read-only: it never buys or changes anything in AWS.
 
 ## Sources
+- AWS Pricing Calculator: https://calculator.aws
+- sample-aws-pricing-calculator-mcp: https://github.com/aws-samples/sample-aws-pricing-calculator-mcp
+- aws-calculator-mcp: https://github.com/Musheer360/aws-calculator-mcp
 - AWS Knowledge MCP Server: https://awslabs.github.io/mcp/servers/aws-knowledge-mcp-server
-- AWS Pricing MCP Server (optional): https://awslabs.github.io/mcp/servers/aws-pricing-mcp-server
-- AWS Billing and Cost Management MCP Server (optional): https://awslabs.github.io/mcp/servers/billing-cost-management-mcp-server

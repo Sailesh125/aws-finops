@@ -1,6 +1,8 @@
 # AWS savings playbook
 
-Typical savings are rough guides – always compute actual savings by re-running `scripts/estimate.py` on the optimized spec.
+Typical savings below are only for picking which levers to try. The saving you report must come from the calculator: build the optimized setup as a second estimate and compare its total with the original.
+
+How to model each lever in the calculator: Savings Plans and Spot via the EC2 `pricingStrategy` field; Graviton by changing `instanceType` (t4g, m7g, c7g, r7g, db.*g); gp2 → gp3 via `storageType`; shutting environments down at night via EC2 `utilization`, or fewer hours; S3 tiering by moving GB to IA or Glacier child services; NAT savings by reducing NAT data processed (and adding the free S3/DynamoDB gateway endpoints).
 
 | # | Lever | Applies to | Typical saving | Effort | Risk |
 |---|---|---|---|---|---|
