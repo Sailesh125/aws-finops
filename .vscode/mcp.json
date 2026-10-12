@@ -1,0 +1,18 @@
+{
+  "servers": {
+    "aws-calculator": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "sample-aws-pricing-calculator-mcp@1.3.3"]
+    },
+    "aws-calculator-costs": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "aws-calculator-mcp@2.3.1"]
+    },
+    "aws-knowledge": {
+      "type": "http",
+      "url": "https://knowledge-mcp.global.api.aws"
+    }
+  }
+}

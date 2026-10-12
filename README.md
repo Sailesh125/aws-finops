@@ -35,6 +35,34 @@ Describe your setup or share Terraform, and Claude builds a real calculator.aws 
 
 All prices come from calculator.aws; the plugin has no built-in price list.
 
+## Use with GitHub Copilot
+The same skill and calculator servers also work as a **Copilot custom agent**.
+
+| File | Used by |
+|---|---|
+| `.github/agents/aws-cost-estimator.agent.md` | Custom agent profile for Copilot cloud agent (github.com), Copilot CLI, and VS Code |
+| `.github/skills/aws-cost-estimator` | The skill: a link to `skills/aws-cost-estimator`, which Copilot loads automatically |
+| `.vscode/mcp.json` | The calculator MCP servers for VS Code agent mode. VS Code ignores `mcp-servers` in agent profiles, so it needs this file. |
+
+**In this repo:** open it in VS Code, start the MCP servers from `.vscode/mcp.json`, then pick **aws-cost-estimator** in the Copilot Chat agent picker. In Copilot CLI, run `/agent`. On github.com, pick it in the agents panel or when assigning Copilot to an issue.
+
+**In your own app repo (shift-left):** copy these three into the repo where your Terraform lives:
+```
+.github/agents/aws-cost-estimator.agent.md
+.github/skills/aws-cost-estimator/      (copy the real folder: skills/aws-cost-estimator)
+.vscode/mcp.json
+```
+Then ask, for example, *"@aws-cost-estimator what will the Terraform in infra/ cost per month? Give me the calculator link."*
+
+Alternatively, install the skill once for all your projects by copying `skills/aws-cost-estimator` to `~/.copilot/skills/`.
+
+**Copilot cloud agent notes:**
+- The agent profile sets up the MCP servers itself.
+- The cloud agent's firewall must allow `calculator.aws`, the calculator's CloudFront endpoints, and `registry.npmjs.org` (for `npx`). Add them in the repo's Copilot settings if calls are blocked.
+- If the runner has no Chrome, cost readback falls back to giving you the estimate link.
+
+**Windows:** `.github/skills/aws-cost-estimator` is a git symlink. If your clone shows it as a small text file, copy `skills/aws-cost-estimator` there instead, or enable `git config core.symlinks true`.
+
 ## Version pinning
 The servers are pinned to the versions this plugin was written against: `sample-aws-pricing-calculator-mcp@1.3.3` and `aws-calculator-mcp@2.3.1`. To upgrade, change the versions in `.mcp.json` and re-test.
 

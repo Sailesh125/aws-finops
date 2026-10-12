@@ -1,6 +1,6 @@
 {
   "name": "aws-finops",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Estimate, analyze and optimize AWS infrastructure costs with the official AWS Pricing Calculator (calculator.aws). Builds shareable estimates and reads back real calculator prices; no AWS credentials needed.",
   "author": {
     "name": "FinOps Shift-Left"
